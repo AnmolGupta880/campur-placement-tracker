@@ -25,10 +25,23 @@ const TeacherDashboard = () => {
           getTeacherStats(),
         ]);
 
-        setStudents(Array.isArray(studentsData) ? studentsData : []);
-        setStats(statsData || stats);
+        if (Array.isArray(studentsData)) {
+          setStudents(studentsData);
+        } else {
+          console.error("Invalid students data:", studentsData);
+          setStudents([]);
+        }
+
+        if (statsData && typeof statsData === 'object') {
+          setStats(statsData);
+        } else {
+          console.error("Invalid stats data:", statsData);
+        }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
+        // Show error message to user
+        alert(`Failed to load data: ${error.message}. Please check your connection and try again.`);
+        setStudents([]);
       } finally {
         setLoading(false);
       }

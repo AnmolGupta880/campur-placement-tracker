@@ -21,9 +21,19 @@ const Signup = () => {
     const fetchColleges = async () => {
       try {
         const data = await getColleges();
-        setColleges(data);
+        if (Array.isArray(data)) {
+          setColleges(data);
+          if (data.length === 0) {
+            setError("No colleges available. Please contact administrator.");
+          } else {
+            setError(""); // Clear error if colleges loaded successfully
+          }
+        } else {
+          setError("Invalid data received from server");
+        }
       } catch (err) {
-        setError("Failed to load colleges");
+        console.error("College fetch error:", err);
+        setError(`Failed to load colleges: ${err.message}. Check if backend is running.`);
       }
     };
     fetchColleges();

@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = import.meta.env.PROD 
+  ? "/api"  // Use proxy in production (Netlify/Vercel)
+  : "http://localhost:5000/api";  // Use localhost in development
 
 const getAuthHeaders = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -16,7 +18,10 @@ export const signup = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error("Signup failed");
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Signup failed");
+  }
   return res.json();
 };
 
@@ -27,7 +32,10 @@ export const login = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error("Login failed");
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Login failed");
+  }
   return res.json();
 };
 
@@ -38,7 +46,10 @@ export const loginTeacher = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error("Login failed");
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Login failed");
+  }
   return res.json();
 };
 
@@ -49,7 +60,10 @@ export const signupTeacher = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!res.ok) throw new Error("Signup failed");
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Signup failed");
+  }
   return res.json();
 };
 
