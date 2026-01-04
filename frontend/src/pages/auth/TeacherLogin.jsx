@@ -28,7 +28,7 @@ const TeacherLogin = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2 className="auth-title">Teacher Login</h2>
+        <h2 className="auth-title">👨‍🏫 Teacher Login</h2>
         <p className="auth-subtitle">Access your teacher dashboard</p>
 
         {error && <div className="error-message">{error}</div>}

@@ -17,6 +17,14 @@ const applicationSchema = new mongoose.Schema(
       enum: ["Applied", "Shortlisted", "Rejected"],
       default: "Applied",
     },
+    resume: {
+      type: String, // Will store resume URL or base64 data
+      default: null,
+    },
+    resumeFileName: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

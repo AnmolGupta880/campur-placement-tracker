@@ -12,8 +12,13 @@ import Company from "../models/Company.js";
 */
 export const applyToCompany = async (req, res) => {
   try {
-    const studentId = req.user._id; // comes from auth middleware
-    const { companyId } = req.body;
+    const studentId = req.user?._id; // comes from auth middleware
+    
+    if (!studentId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { companyId, resume, resumeFileName } = req.body;
 
     if (!companyId) {
       return res.status(400).json({ message: "Company ID is required" });
@@ -21,6 +26,11 @@ export const applyToCompany = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(companyId)) {
       return res.status(400).json({ message: "Invalid company ID" });
+    }
+
+    // Validate resume size if provided (max 5MB base64)
+    if (resume && resume.length > 7 * 1024 * 1024) { // ~5MB base64 = ~7MB string
+      return res.status(400).json({ message: "Resume file is too large. Maximum size is 5MB." });
     }
 
     const student = await Student.findById(studentId);
@@ -48,12 +58,19 @@ export const applyToCompany = async (req, res) => {
       student: studentId,
       company: companyId,
       status: "Applied",
+      resume: resume || null,
+      resumeFileName: resumeFileName || null,
     });
 
-    return res.status(201).json(application);
+    const populatedApplication = await Application.findById(application._id)
+      .populate("company", "name role ctc");
+
+    return res.status(201).json(populatedApplication);
   } catch (error) {
     console.error("Apply error:", error);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ 
+      message: error.message || "Failed to submit application" 
+    });
   }
 };
 

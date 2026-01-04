@@ -5,8 +5,10 @@
   "description": "Campus Placement Tracker Backend",
   "scripts": {
     "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
     "seed": "node src/scripts/seedData.js",
-    "add-companies": "node src/scripts/addMoreCompanies.js"
+    "add-companies": "node src/scripts/addMoreCompanies.js",
+    "seed-teacher": "node src/scripts/seedTeacher.js"
   },
   "keywords": [],
   "author": "",

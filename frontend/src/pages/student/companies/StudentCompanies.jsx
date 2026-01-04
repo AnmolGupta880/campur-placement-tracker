@@ -17,6 +17,10 @@ const StudentCompanies = () => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name"); // name, ctc, date
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [resume, setResume] = useState(null);
+  const [resumeFileName, setResumeFileName] = useState("");
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   // 🔹 Fetch companies + applications + profile together
   useEffect(() => {
@@ -75,19 +79,63 @@ const StudentCompanies = () => {
       }
     });
 
-  // 🔹 Handle Apply click
-  const handleApply = async (companyId) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size must be less than 5MB");
+        return;
+      }
+      
+      // Check file type (PDF only)
+      if (file.type !== "application/pdf") {
+        alert("Please upload a PDF file only");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setResume(reader.result); // Base64 string
+        setResumeFileName(file.name);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleApplyClick = (companyId) => {
     if (!isEligible) {
       alert("You are not eligible to apply. You need a CGPA of 7.0 or higher.");
       return;
     }
+    setSelectedCompany(companyId);
+    setShowResumeModal(true);
+  };
+
+  // 🔹 Handle Apply click
+  const handleApply = async () => {
+    if (!selectedCompany) return;
+
+    if (!resume) {
+      const confirm = window.confirm("No resume uploaded. Continue without resume?");
+      if (!confirm) {
+        setShowResumeModal(false);
+        return;
+      }
+    }
 
     try {
-      await applyToCompany(companyId);
+      await applyToCompany(selectedCompany, resume, resumeFileName);
 
       // 🔁 Re-fetch applications after apply
       const updatedApplications = await getApplications();
       setApplications(updatedApplications);
+      
+      setShowResumeModal(false);
+      setResume(null);
+      setResumeFileName("");
+      setSelectedCompany(null);
+      alert("Application submitted successfully!");
     } catch (err) {
       alert(err.message || "Failed to apply");
     }
@@ -186,7 +234,7 @@ const StudentCompanies = () => {
                     disabled={isApplied || !isEligible}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleApply(company._id);
+                      handleApplyClick(company._id);
                     }}
                   >
                     {isApplied
@@ -208,6 +256,66 @@ const StudentCompanies = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Resume Upload Modal */}
+      {showResumeModal && (
+        <div className="resume-modal-overlay" onClick={() => setShowResumeModal(false)}>
+          <div className="resume-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="resume-modal-header">
+              <h3>Upload Resume</h3>
+              <button 
+                className="close-modal-btn"
+                onClick={() => {
+                  setShowResumeModal(false);
+                  setResume(null);
+                  setResumeFileName("");
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="resume-modal-body">
+              <label className="resume-upload-label-modal">
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  className="resume-input"
+                />
+                <div className="resume-upload-area">
+                  <span className="upload-icon">📄</span>
+                  <span className="upload-text">
+                    {resumeFileName || "Click to upload resume (PDF, Max 5MB)"}
+                  </span>
+                </div>
+              </label>
+              {resumeFileName && (
+                <div className="resume-preview">
+                  <span className="resume-file-name">✓ {resumeFileName}</span>
+                </div>
+              )}
+              <div className="resume-modal-actions">
+                <button
+                  className="cancel-btn"
+                  onClick={() => {
+                    setShowResumeModal(false);
+                    setResume(null);
+                    setResumeFileName("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="submit-btn"
+                  onClick={handleApply}
+                >
+                  Submit Application
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

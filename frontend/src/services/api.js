@@ -165,14 +165,18 @@ export const getApplications = async () => {
   return res.json();
 };
 
-export const applyToCompany = async (companyId) => {
+export const applyToCompany = async (companyId, resume = null, resumeFileName = null) => {
   const res = await fetch(`${API_URL}/applications`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       ...getAuthHeaders(),
     },
-    body: JSON.stringify({ companyId }),
+    body: JSON.stringify({ 
+      companyId,
+      resume,
+      resumeFileName 
+    }),
   });
 
   if (!res.ok) {

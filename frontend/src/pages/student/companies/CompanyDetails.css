@@ -181,3 +181,47 @@
   cursor: not-allowed;
 }
 
+.resume-upload-section {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+.resume-upload-label {
+  display: block;
+  cursor: pointer;
+}
+
+.resume-input {
+  display: none;
+}
+
+.resume-upload-btn {
+  display: inline-block;
+  padding: 12px 20px;
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  color: #667eea;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.resume-upload-btn:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.resume-file-name {
+  display: block;
+  margin-top: 12px;
+  color: #10b981;
+  font-weight: 600;
+  font-size: 14px;
+}
+

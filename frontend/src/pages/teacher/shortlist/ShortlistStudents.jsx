@@ -8,6 +8,8 @@ const ShortlistStudents = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, applied, shortlisted, rejected
+  const [selectedResume, setSelectedResume] = useState(null);
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -123,6 +125,7 @@ const ShortlistStudents = () => {
                 <th>Company</th>
                 <th>Role</th>
                 <th>CTC</th>
+                <th>Resume</th>
                 <th>Current Status</th>
                 <th>Actions</th>
               </tr>
@@ -136,6 +139,21 @@ const ShortlistStudents = () => {
                   <td>{app.company?.name || "N/A"}</td>
                   <td>{app.company?.role || "N/A"}</td>
                   <td>{app.company?.ctc || "N/A"}</td>
+                  <td>
+                    {app.resume ? (
+                      <button
+                        className="view-resume-btn"
+                        onClick={() => {
+                          setSelectedResume(app.resume);
+                          setShowResumeModal(true);
+                        }}
+                      >
+                        📄 View CV
+                      </button>
+                    ) : (
+                      <span style={{ color: "#9ca3af", fontSize: "12px" }}>No resume</span>
+                    )}
+                  </td>
                   <td>
                     <span className={`status-badge ${app.status?.toLowerCase()}`}>
                       {app.status || "Applied"}
@@ -175,6 +193,47 @@ const ShortlistStudents = () => {
           </table>
         )}
       </div>
+
+      {/* Resume View Modal */}
+      {showResumeModal && selectedResume && (
+        <div className="resume-view-modal-overlay" onClick={() => setShowResumeModal(false)}>
+          <div className="resume-view-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="resume-modal-header">
+              <h3>Student Resume</h3>
+              <button 
+                className="close-modal-btn"
+                onClick={() => {
+                  setShowResumeModal(false);
+                  setSelectedResume(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="resume-viewer">
+              <iframe
+                src={selectedResume}
+                title="Student Resume"
+                style={{
+                  width: "100%",
+                  height: "600px",
+                  border: "none",
+                  borderRadius: "8px",
+                }}
+              />
+              <div className="resume-actions">
+                <a
+                  href={selectedResume}
+                  download="resume.pdf"
+                  className="download-resume-btn"
+                >
+                  📥 Download Resume
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
