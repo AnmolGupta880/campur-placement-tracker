@@ -12,7 +12,8 @@ const connectDB = async () => {
     }
 
     // Validate connection string format
-    const mongoUri = process.env.MONGO_URI.trim();
+    // Strip surrounding quotes that some hosting dashboards may inject
+    const mongoUri = process.env.MONGO_URI.trim().replace(/^"(.*)"$/, "$1").replace(/^'(.*)'$/, "$1");
     
     if (!mongoUri.startsWith("mongodb://") && !mongoUri.startsWith("mongodb+srv://")) {
       console.error("❌ ERROR: Invalid MONGO_URI format");
@@ -22,12 +23,12 @@ const connectDB = async () => {
 
     console.log("🔄 Attempting to connect to MongoDB...");
     
-    const conn = await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 10000, // Timeout after 10s
-      socketTimeoutMS: 45000,
-      retryWrites: true,
-      w: "majority",
-    });
+   const conn = await mongoose.connect(mongoUri, {
+  serverSelectionTimeoutMS: 10000,
+  family: 4, // force IPv4 (safe + recommended)
+});
+
+
     
     console.log(`✅ MongoDB connected successfully!`);
     console.log(`   Host: ${conn.connection.host}`);

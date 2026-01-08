@@ -11,6 +11,14 @@ import teacherRoutes from "./routes/teacherRoutes.js";
 
 dotenv.config();
 
+// Support common environment variable names provided by hosts (Render, etc.)
+// If a host provides `DATABASE_URL`, `MONGODB_URI` or `DATABASE_URI`, map it to `MONGO_URI`.
+// Also strip surrounding quotes if the dashboard injects them.
+const _rawMongo = process.env.MONGO_URI || process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.DATABASE_URI;
+if (_rawMongo && !process.env.MONGO_URI) {
+  process.env.MONGO_URI = _rawMongo.trim().replace(/^"(.*)"$/, "$1").replace(/^'(.*)'$/, "$1");
+}
+
 // Validate required environment variables
 if (!process.env.JWT_SECRET) {
   console.error("\n❌ ERROR: JWT_SECRET is not set in environment variables");
